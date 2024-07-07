@@ -43,12 +43,12 @@ const ProductPicker = ({onAddProducts, selectedProduct, selectedVariantIds }) =>
         },
         {
             "id": 80,
-            "title": "Orbit Terrarium - Large",
+            "title": "Orbit Terrarium",
             "variants": [
                 {
                     "id": 64,
                     "product_id": 80,
-                    "title": "Default Title",
+                    "title": "Large / Black",
                     "price": "109"
                 }
             ],

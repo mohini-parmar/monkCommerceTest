@@ -109,25 +109,44 @@ const ProductList = ({ isModalOpen, handleOpenModal, handleCloseModal }) => {
 
     const handleDragEnd = (event) => {
         const { active, over } = event;
+        console.log('Active ID:', active.id);
+        console.log('Over ID:', over.id);
         if (!over) return;
-
+    
         if (active.id.startsWith('product-') && over.id.startsWith('product-')) {
             const oldIndex = products.findIndex(p => `product-${p.id}` === active.id);
             const newIndex = products.findIndex(p => `product-${p.id}` === over.id);
-
+    
             if (oldIndex !== -1 && newIndex !== -1) {
                 setProducts((items) => arrayMove(items, oldIndex, newIndex));
             }
-        } else if (active.id.startsWith('variant-') && over.id.startsWith('variant-')) {
-            const [productId] = active.id.split('-').slice(1, 2);
-            const product = products.find(p => p.id === Number(productId));
-            const oldIndex = product.variants.findIndex(v => `variant-${v.id}` === active.id);
-            const newIndex = product.variants.findIndex(v => `variant-${v.id}` === over.id);
-
-            product.variants = arrayMove(product.variants, oldIndex, newIndex);
-            setProducts([...products]);
+        } 
+        else if (active.id.startsWith('variant-') && over.id.startsWith('variant-')) {
+            const [ activeVariantId, productId] = active.id.split('-').slice(1);
+            const [, overVariantId] = over.id.split('-');
+        
+            const productIndex = products.findIndex(p => p.id === Number(productId));
+            console.log('productIndex ', productIndex);
+            if (productIndex !== -1) {
+        
+                const oldIndex = products[productIndex].variants.findIndex(v => v.id === Number(activeVariantId));
+                const newIndex = products[productIndex].variants.findIndex(v => v.id === Number(overVariantId));
+        
+                if (oldIndex !== -1 && newIndex !== -1) {
+                    setProducts(prevProducts => {
+                        const updatedProducts = [...prevProducts];
+                        const variants = [...updatedProducts[productIndex].variants];
+                        const [movedItem] = variants.splice(oldIndex, 1);
+                        variants.splice(newIndex, 0, movedItem);
+                        updatedProducts[productIndex] = { ...updatedProducts[productIndex], variants };
+                        return updatedProducts;
+                    });
+                }
+            }
         }
+        
     };
+    
 
 
     const selectedProducts = products && products.filter(product => selectedProductsIds.includes(product.id)) || []
@@ -198,10 +217,10 @@ const ProductList = ({ isModalOpen, handleOpenModal, handleCloseModal }) => {
                                         }
                                     </div>
                                     {showVariants[prd.id] &&
-                                        <SortableContext items={productVariants.map(variant => `variant-${variant.id}`)} strategy={verticalListSortingStrategy}>
+                                        <SortableContext items={productVariants.map(variant => `variant-${variant.id}-${prd.id}`)} strategy={verticalListSortingStrategy}>
                                             <div className='variant-container'>
                                                 {productVariants.map(variant => (
-                                                    <SortableProductItem key={`variant-${variant.id}`} id={`variant-${variant.id}`}>
+                                                    <SortableProductItem key={`variant-${variant.id}`} id={`variant-${variant.id}-${prd.id}`}>
                                                         <div className='variant-item mt-2' key={variant.id}>
                                                             <span className='me-auto'>{variant.title}</span>
                                                             <button className='btn btn-sm ms-2' onClick={() => removeVariant(variant.id)}>×</button>
