@@ -1,0 +1,2 @@
+I was not able to access API due to CORS error that I faced. I have written API fetch code, as it was not working
+I used demo response of API given in the link and used to build my React App.
